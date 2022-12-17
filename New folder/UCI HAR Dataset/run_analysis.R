@@ -5,8 +5,7 @@ setwd("C:/Users/CH/Rproj/ProjCursera/datasciencecoursera/New folder/UCI HAR Data
 
 
 
-#filenames <- list.files("C:/Users/CH/Rproj/ProjCursera/datasciencecoursera/New folder/UCI HAR Dataset", recursive=TRUE)
-#files <- dir("C:/Users/CH/Rproj/ProjCursera/datasciencecoursera/New folder/UCI HAR Dataset", recursive=TRUE, full.names=TRUE, pattern="\\.txt$")
+
 
 features <- read.table("features.txt", col.names = c("nr","features"))
 activity_labels <- read.table("activity_labels.txt", col.names = c("code", "activity")) 
