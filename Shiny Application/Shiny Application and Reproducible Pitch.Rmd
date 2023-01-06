@@ -1,0 +1,54 @@
+---
+title: "Shiny Application and Reproducible Pitch"
+output: ioslides_presentation
+date: "2023-01-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+library(gganimate)
+```
+
+## Project Goal
+
+This peer assessed assignment has two parts.
+
+First, you will create a Shiny application and deploy it on Rstudio’s servers.
+
+Second, you will use Slidify or Rstudio Presenter to prepare a reproducible pitch presentation about your application.
+
+## Steps to Perform
+- Write a shiny application with associated supporting documentation. The documentation should be thought of as whatever a user will need to get started using your application.
+- Deploy the application on Rstudio’s shiny server
+- Share the application link by pasting it into the provided text box
+- Share your server.R and ui.R code on github
+
+
+## How to use the application
+It is a simple application where you can choose iris characteristics.
+The data used, and code are in github repository.
+
+
+
+
+
+```{r, echo = TRUE}
+
+```
+
+## Slide with Plot
+
+```{r}
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) +
+  geom_point(
+    aes(color = Species, shape = Species),
+    size = 1.5, 
+    alpha = 0.8 
+  ) +
+  # Use custom colors
+  scale_color_manual(
+    values = c("#386cb0", "#fdb462", "#7fc97f")
+  )
+```
+
