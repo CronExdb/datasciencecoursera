@@ -1,0 +1,59 @@
+library(tidyverse)
+library(ggplot2)
+library(caret)
+library(doParallel)
+library(rpart)
+library(rattle)
+
+testing_data <- read.csv('pml-testing.csv', na.strings=c("NA","#DIV/0!","")) 
+train_data <- read.csv('pml-training.csv', na.strings=c("NA","#DIV/0!","")) 
+
+
+
+set.seed(5332)
+train_data<-train_data[8:length(train_data)] 
+testing_data<-testing_data[8:length(testing_data)]
+  
+train_data<-train_data[,colSums(is.na(train_data)) == 0]
+testing_data <-testing_data[,colSums(is.na(testing_data)) == 0] 
+
+
+train_split <- createDataPartition(train_data$classe,p = 0.75,list = FALSE)
+train <- train_data[train_split,]
+train_test <- train_data[-train_split,]
+
+
+
+#Regression Trees
+model_rt <- rpart(classe ~ ., data=train, method="class")
+
+predict_rt <- predict(model_rt, train_test, type = "class")
+
+rpart.plot(model_rt, main="Classification Tree", roundint = FALSE)
+
+confusionMatrix(predict_rt, as.factor(train_test$classe))
+
+
+
+
+
+
+#Random Forests
+cl<-makePSOCKcluster(5)
+registerDoParallel(cl)
+
+model_rf <- train(classe~., data=train, method="rf")
+
+stopCluster(cl)
+
+prediction_rf <- predict(model_rf, train_test)
+
+confusionMatrix(prediction_rf, as.factor(train_test$classe))
+
+
+fancyRpartPlot(model_rt, uniform = T, main = "Classification Tree")
+
+
+predict(model_rt, testing_data)
+
+predict(model_rf, testing_data)
