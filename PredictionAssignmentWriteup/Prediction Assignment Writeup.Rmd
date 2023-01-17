@@ -12,7 +12,7 @@ library(doParallel)
 library(rpart)
 library(rpart.plot)
 ```
-## Loading and cleaning data
+# Loading and cleaning data
 
 Load training and test datasets.
 ```{r}
