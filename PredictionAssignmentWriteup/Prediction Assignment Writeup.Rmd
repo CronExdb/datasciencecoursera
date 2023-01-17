@@ -6,50 +6,72 @@ date: "2023-01-16"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
 library(ggplot2)
 library(caret)
 library(doParallel)
 library(rpart)
 library(rpart.plot)
 ```
+## Loading and cleaning data
 
-
+Load training and test datasets.
 ```{r}
 testing_data <- read.csv('pml-testing.csv', na.strings=c("NA","#DIV/0!","")) 
 train_data <- read.csv('pml-training.csv', na.strings=c("NA","#DIV/0!","")) 
-
-
-
+```
+Set seed and clean the data. Removing first 7 columns since they meant for identification purpose only.
+```{r}
 set.seed(5332)
 train_data<-train_data[8:length(train_data)] 
 testing_data<-testing_data[8:length(testing_data)]
   
 train_data<-train_data[,colSums(is.na(train_data)) == 0]
 testing_data <-testing_data[,colSums(is.na(testing_data)) == 0] 
+```
 
-
+Split data in to two partitions 75% and 25% from the train data set.
+```{r}
 train_split <- createDataPartition(train_data$classe,p = 0.75,list = FALSE)
 train <- train_data[train_split,]
 train_test <- train_data[-train_split,]
+```
 
 
+## Predictions of the decision tree model
+```{r}
 
-#Regression Trees
 model_rt <- rpart(classe ~ ., data=train, method="class")
 
 predict_rt <- predict(model_rt, train_test, type = "class")
 
 rpart.plot(model_rt, main="Classification Tree", roundint = FALSE)
+```
+Prune the tree to remove least important splits, based on the complexity parameter (cp)
 
+```{r}
+prune.model_rt <- prune(model_rt, cp=0.05)
+rpart.plot(prune.model_rt, main="Classification Tree", roundint = FALSE)
 confusionMatrix(predict_rt, as.factor(train_test$classe))
+```
 
 
+The predictive accuracy of model is 74.33% in the testing subset.
+Accuracy could be better. Lets try boosted predictor using the “gbm” and  random forests and see if we can improve accuracy.
 
 
+## Generalized boosted model
+```{r}
+model_bm <- train( classe ~.,data = train,method = "gbm", verbose = FALSE)
+predict_bm <- predict(model_bm, train_test)
+confusionMatrix(predict_bm, as.factor(train_test$classe))
+```
+The predictive accuracy of model is 96.41% 
 
 
-#Random Forests
+## Random Forests
+Building the random forest model with parallel computing to save time.
+The time period usually for training a model is greater.
+```{r}
 cl<-makePSOCKcluster(5)
 registerDoParallel(cl)
 
@@ -60,13 +82,19 @@ stopCluster(cl)
 prediction_rf <- predict(model_rf, train_test)
 
 confusionMatrix(prediction_rf, as.factor(train_test$classe))
+```
 
 
 
+### Sum up
 
+* Decision Tree Model: 74.33%
+* Generalized boosted model: 96.41% 
+* Random Forest: 100%
 
-predict(model_rt, testing_data)
+From the results we can see that the Random Forest has the highest accuracy rate.
 
+```{r}
 predict(model_rf, testing_data)
 ```
 
